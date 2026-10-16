@@ -7,7 +7,14 @@ const validarId = (id) => {
     return numero;
 };
 
-const listar = () => productoRepository.findAll();
+// Si llega "nombre" filtra por coincidencia parcial; sin él devuelve todos
+const listar = (nombre) => {
+    if (nombre === undefined) return productoRepository.findAll();
+    if (typeof nombre !== 'string' || nombre.trim() === '') {
+        throw new HttpError(400, 'El parámetro "nombre" debe ser un texto no vacío');
+    }
+    return productoRepository.findByNombre(nombre.trim());
+};
 
 const obtenerPorId = async (id) => {
     const producto = await productoRepository.findById(validarId(id));

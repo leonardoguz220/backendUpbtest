@@ -6,6 +6,13 @@ const findAll = async () => {
     return rows.map(Producto.fromRow);
 };
 
+// Búsqueda parcial por nombre, sin distinguir mayúsculas; escapa % _ \ para tratarlos como texto literal
+const findByNombre = async (texto) => {
+    const patron = `%${texto.replace(/[\\%_]/g, '\\$&')}%`;
+    const { rows } = await pool.query('SELECT * FROM productos WHERE nombre ILIKE $1 ORDER BY id', [patron]);
+    return rows.map(Producto.fromRow);
+};
+
 const findById = async (id) => {
     const { rows } = await pool.query('SELECT * FROM productos WHERE id = $1', [id]);
     return Producto.fromRow(rows[0]);
@@ -37,4 +44,4 @@ const remove = async (id) => {
     return rowCount > 0;
 };
 
-module.exports = { findAll, findById, create, update, remove };
+module.exports = { findAll, findByNombre, findById, create, update, remove };
